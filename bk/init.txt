@@ -1,0 +1,62 @@
+	//TODO: use DOM tools instead of inputting text as it's "bad practise" 
+	var container = document.getElementById("pooltable");
+	//container.addElement("svg");
+	/*
+	 * <circle cx="120" cy="150" r="'+ball_size+'" fill="purple" id="purpleball" />\
+	<circle cx="120" cy="180" r="'+ball_size+'" fill="brown" id="brownball" />\
+	<circle cx="90" cy="180" r="'+ball_size+'" fill="pink" id="pinkball" />\
+	<circle cx="60" cy="100" r="'+ball_size+'" fill="orange" id="orangeball" />\
+	<circle cx="20" cy="100" r="'+ball_size+'" fill="green" id="greenball" />\
+	<circle cx="60" cy="160" r="'+ball_size+'" fill="yellow" id="yellowball" />\*/
+	
+	/*	<circle cx="70" cy="135" r="'+ball_size+'" fill="blue" id="blueball" />\
+		<circle cx="110" cy="105" r="'+ball_size+'" fill="red" id="redball" />\ */
+	
+	container.innerHTML = '<svg width="'+SIZE_X+'" height="'+SIZE_Y+'" id="table" >\
+	<rect x="0" y="0" width="'+SIZE_X+'" height="'+SIZE_Y+'" fill="lightgray" />\
+	<circle cx="400" cy="310" r="'+ball_size+'" id="ball0" class="billiardballcircle" />\
+	<circle cx="200" cy="290" r="'+ball_size+'" id="ball1" class="billiardballcircle" />\
+	<circle cx="200" cy="330" r="'+ball_size+'" id="ball2" class="billiardballcircle" />\
+	<circle cx="235" cy="310" r="'+ball_size+'" id="ball3" class="billiardballcircle" />\
+	<circle cx="165" cy="270" r="'+ball_size+'" id="ball4" class="billiardballcircle" />\
+	<circle cx="165" cy="350" r="'+ball_size+'" id="ball5" class="billiardballcircle" />\
+	<circle cx="165" cy="310" r="'+ball_size+'" id="ball6" class="billiardballcircle" />\
+	<circle cx="130" cy="250" r="'+ball_size+'" id="ball7" class="billiardballcircle" />\
+	<circle cx="130" cy="370" r="'+ball_size+'" id="ball8" class="billiardballcircle" />\
+	<circle cx="130" cy="290" r="'+ball_size+'" id="ball9" class="billiardballcircle" />\
+	<circle cx="130" cy="330" r="'+ball_size+'" id="ball10" class="billiardballcircle" />\
+	<circle cx="95" cy="230" r="'+ball_size+'" id="ball11" class="billiardballcircle" />\
+	<circle cx="95" cy="270" r="'+ball_size+'" id="ball12" class="billiardballcircle" />\
+	<circle cx="95" cy="310" r="'+ball_size+'" id="ball13" class="billiardballcircle" />\
+	<circle cx="95" cy="350" r="'+ball_size+'" id="ball14" class="billiardballcircle" />\
+	<circle cx="95" cy="390" r="'+ball_size+'" id="ball15" class="billiardballcircle" />\
+	</svg>';
+	var table = container.getElementsByTagName("svg")[0];
+	table.addEventListener("mousedown",function(evt){mouseDown(evt);});
+	table.addEventListener("mouseup",function(evt){mouseUp(evt);});
+/*	balls[0] = document.getElementById("whiteball");//sticks together
+	balls[0].speedx = 0;//causes problem when balls are at 0 or low speeds
+	balls[0].speedy = 0; //y direction is at 0 radii
+	balls[0].ncx = 0.0;
+	balls[0].ncy = 0.0;
+	balls[1] = document.getElementById("blackball");
+	balls[1].speedx = 0;
+	balls[1].speedy = 0;
+	balls[1].ncx = 0.0;
+	balls[1].ncx = 0.0;
+	balls[2] = document.getElementById("blueball");
+	balls[2].speedx = 0;
+	balls[2].speedy = 0;
+	balls[3] = document.getElementById("redball");
+	balls[3].speedx = 0;
+	balls[3].speedy = 0;*/
+	balls = document.getElementsByClassName("billiardballcircle");
+	for(var i = 0; i < balls.length; i++){
+		balls[i].speedx = 0;
+		balls[i].speedy = 0;
+		balls[i].ncx = 0.0;
+		balls[i].ncx = 0.0;
+		balls[i].setAttribute("fill",ballColours[i]);
+	}
+	balls[0].speedx = 0;
+	

@@ -1,0 +1,318 @@
+
+const FRICTION = 0.005;//friction coefficient to slow down balls per frame
+const RESTITUTION = 1.0;//coefficient of restitution of ball collisions
+const RESTITUTION_S = 1.0;//coeff restitution of balls and cushon
+const FPS = 30;//frames per second
+const SIZE_X = 500;//size of the table
+const SIZE_Y = 300;
+
+var ball_size = 10;//size of the balls
+var container;//div the table is drawn in
+
+var balls = new Array();
+var pressTime = 0;
+var startPress = 0;
+
+var collisions = new Array();
+var ts = new Array();
+
+
+//initialise table + balls
+//firstly, place a pool table looking thing inside the div container.
+//second, draw a bunch of balls and store their references into an array
+//thirdly, give the balls some additional data such as their speeds and  directions
+function init(){
+	//TODO: use DOM tools instead of inputting text as it's "bad practise" 
+	var container = document.getElementById("pooltable");
+	container.innerHTML = '<svg width="'+SIZE_X+'" height="'+SIZE_Y+'" onmousedown="mouseDown();" onmouseup="mouseUp();" onmouseleave="mouseUp();" >\
+	<rect x="0" y="0" width="'+SIZE_X+'" height="'+SIZE_Y+'" fill="green" /><circle cx="300" cy="90" r="'+ball_size+'" fill="white" id="whiteball" />\
+	<circle cx="80" cy="90" r="'+ball_size+'" fill="black" id="blackball" />\
+	<circle cx="80" cy="110" r="'+ball_size+'" fill="blue" id="blueball" />\
+	<circle cx="100" cy="100" r="'+ball_size+'" fill="red" id="redball" />\
+	</svg>';
+	balls[0] = document.getElementById("whiteball");//sticks together
+	balls[0].speedx = -6;//causes problem when balls are at 0 or low speeds
+	balls[0].speedy = 0.5; //y direction is at 0 radii
+	balls[0].ncx = 0.0;
+	balls[0].ncy = 0.0;
+	balls[1] = document.getElementById("blackball");
+	balls[1].speedx = 0;
+	balls[1].speedy = 0;
+	balls[1].ncx = 0.0;
+	balls[1].ncx = 0.0;
+	balls[2] = document.getElementById("blueball");
+	balls[2].speedx = 0;
+	balls[2].speedy = 0;
+	balls[3] = document.getElementById("redball");
+	balls[3].speedx = 0;
+	balls[3].speedy = 0;
+}
+
+function friction(){
+	var f = 1.0-FRICTION;
+	for(var i = 0; i < balls.length; i++){
+		balls[i].speedx = f*balls[i].speedx;
+		balls[i].speedy = f*balls[i].speedy;
+		if(Math.pow(balls[i].speedx,2) + Math.pow(balls[i].speedy,2) < FRICTION){
+			balls[i].speedx = 0;
+			balls[i].speedy = 0;
+		} 
+	}
+}
+
+function ballToString(ball){
+	var cx = parseFloat(ball.getAttribute("cx"),10);
+	var cy = parseFloat(ball.getAttribute("cy"),10);
+	var str = "old=("+cx+","+cy+"), new=("+ball.ncx+","+ball.ncy+"), speed=("+ball.speedx+","+ball.speedy+")";
+	return str;
+}
+
+//make balls move (and collide) according to their speeds and directions
+function animate(){
+	
+	var smallestt = 0;//used in calculating next collision in frame
+	var smallesti = 0;//if two collisions happen at similar times these 
+	var smallestj = 0;//variables can be used to calculate the outcome of all
+	
+	//reset collision matrix
+	for(i = 0; i < balls.length; i++){
+		for(j = 0; j < balls.length; j++){
+			if(i == j){
+				continue;
+			}
+			collisions[i*balls.length + j] = 0;
+			ts[i*balls.length + j] = 0;
+		}
+	}
+	//collision detection - detect if two balls collide and ammend their new speeds and places if they do. 
+	//todo: two balls is perhaps not accurate enough! - how to fix? faster framerate?
+	//first: work out where the balls end up in the next frame.
+	//Get their speeds and their distances from eachother. if they are not able to collide in this frame they can be ignored
+	//Next, test if they actually collide. If they don't, ignore them for this frame. 
+	//Find the time of the collision and angle of contact on the balls to work out the energy transfer.
+	//Update the new positions and the new speeds and repeat until all collisions have been accounted for
+	
+	//Work out the new place for next frame:
+	for(i = 0; i < balls.length; i++){
+		balls[i].ncx = parseFloat(balls[i].getAttribute("cx"),10) + balls[i].speedx;
+		balls[i].ncy = parseFloat(balls[i].getAttribute("cy"),10) + balls[i].speedy;
+	}
+	
+	//test their speed and position for possible collisions
+	//if two balls speeds are larger than their distance from eachother, they may collide in this frame
+	for(i = 0; i < balls.length; i++){
+		var cx1 = parseFloat(balls[i].getAttribute("cx"),10);//lucky this is stored as a float!
+		var cy1 = parseFloat(balls[i].getAttribute("cy"),10);
+		var speed1 = Math.sqrt(Math.pow(balls[i].speedx,2) + Math.pow(balls[i].speedy,2));
+
+		for(j = 0; j < i; j++){
+			var cx2 = parseFloat(balls[j].getAttribute("cx"),10);//lucky this is stored as a float!
+			var cy2 = parseFloat(balls[j].getAttribute("cy"),10);
+		
+			var dist = Math.sqrt(Math.pow(cx1 - cx2,2) + Math.pow(cy1 - cy2,2));
+			var speed2 = Math.sqrt(Math.pow(balls[j].speedx,2) + Math.pow(balls[j].speedy,2));
+			if(dist <= speed1 + speed2 + ball_size*2){
+				//Potential collision
+				collisions[i*balls.length + j] = 1;
+				collisions[j*balls.length + i] = 1;
+			}
+		}
+	}
+	
+	//Get the point of contact and the value of t that they collided at distance d to work out new positions and speeds
+	//METHOD: put lines into form r = a + tb. then dist(a1 + tb1 , a2+tb2), where a1 = (x11,y11), b1 = (x12,y12), 
+	//a2 = (x21,y21), b2 = (x22,y22). thus, sqrt(((x11 + tx12) - (x21 - tx22))^2 + ((y11 + ty12) - (y21 - ty22))^2) = d
+	// ** + square both sides of =
+	//=> ((x11 - x21) +t(x12 - x22))^2 + ((y11 - y21) +t(y12 - y22))^2 = d^2
+	// ** more re arrangement gives a nice quad of at^2 + bt + c = d^2. 
+	for(i = 0; i < balls.length; i++){
+		for(j = 0; j < i; j++){
+			if(collisions[i*balls.length + j] == 1){
+				var bcxi = parseFloat(balls[i].getAttribute("cx"),10);
+				var bcxj = parseFloat(balls[j].getAttribute("cx"),10);
+				var bcyi = parseFloat(balls[i].getAttribute("cy"),10);
+				var bcyj = parseFloat(balls[j].getAttribute("cy"),10);
+				//give values (some magic i worked out here :) )
+				var n1 = bcxi - bcxj;//ax1 = cx(i), bx1 = cx(j), ax2 = ncx(i) - cx(i), bx2 =
+				var n3 = bcyi - bcyj;
+				var n2 = (balls[i].ncx - bcxi) -  (balls[j].ncx - bcxj);
+				var n4 = (balls[i].ncy - bcyi) -  (balls[j].ncy - bcyj);
+				var a = (n2*n2) + (n4*n4);
+				var b = 2*(n1*n2 + n3*n4);
+				var c = (n1*n1) + (n3*n3) - (4*ball_size*ball_size);
+				var det = Math.pow(b,2) - 4*a*c;
+				//alert(a+"t^2 + "+b+"t + "+c+", det="+det);
+				//quad eq to find t with a,b and c
+				if(det <= 0){
+					//balls don't collide - no intersection point
+					collisions[i*balls.length + j] = 0;
+					collisions[j*balls.length + i] = 0;
+				}else{
+					//find their collision point (smallest positive) since t = time :D
+					var t = 0; 
+					var t1 = (-b - Math.sqrt(Math.pow(b,2) - 4*a*c))/(2*a);
+					var t2 = (-b + Math.sqrt(Math.pow(b,2) - 4*a*c))/(2*a);
+					var tt1 = 3;
+					var tt2 = 3;
+					if(t1 > 0){
+						tt1 = t1;
+					}
+					if(t2 > 0){
+						tt2 = t2;
+					}
+					t = tt1 < tt2 ? tt1 : tt2;
+					//alert("t1 = "+t1+", t2 = "+t2+", t = "+t);
+					if(t < 1 && t > 0){
+						//collision point
+						ts[i*balls.length + j] = t;
+						ts[j*balls.length + i] = t;
+					}else{
+						//no collision in this particular frame
+						collisions[i*balls.length + j] = 0;
+						collisions[j*balls.length + i] = 0;
+					}
+				}
+			}
+		}
+	}
+	
+	//test wall bounces
+	//when the ball hits into a cushon, this corrects where it will be on the next frame
+	//For example:  
+	//      table width is 100
+	//	ball radius is 5
+	//	position x = 94 
+	//	speed x = 8
+	// THEN: boundary = 100-5, new position x = 102
+	// BUT 102 is 7 bigger than 95 so it has moved backwards by -7
+	// new position = 95 - 7
+	//in the next frame it must be at 88 heading in the opposite direction (since it bounced between frames) 
+	for(i = 0; i < balls.length; i++){
+		//alert(ball);
+		var cx = parseFloat(balls[i].getAttribute("cx"),10);//lucky this is stored as a float!
+		var cy = parseFloat(balls[i].getAttribute("cy"),10);
+		balls[i].ncx = cx+balls[i].speedx;
+		balls[i].ncy = cy+balls[i].speedy;
+		if(balls[i].ncx < 0 + ball_size){
+			//bounce off left cushon
+			//find t for comparing collisions
+			ts[balls.length * balls.length + i] = (balls[i].speedx / (cx - ball_size));// correct? 
+			balls[i].ncx = ball_size - balls[i].ncx + ball_size;
+			balls[i].speedx = -balls[i].speedx*RESTITUTION_S;
+		}
+		if(balls[i].ncx > SIZE_X - ball_size){
+			//bounce off right cushon
+			ts[balls.length * balls.length + i] = (balls[i].speedx / (SIZE_X - ball_size - cx));//
+			balls[i].ncx = (SIZE_X - ball_size) - (balls[i].ncx -(SIZE_X - ball_size));
+			balls[i].speedx = -balls[i].speedx*RESTITUTION_S;
+		}
+		if(balls[i].ncy < 0 + ball_size){
+			//bounce off top cushon	
+			ts[balls.length * balls.length + i] = (balls[i].speedy / (cy - ball_size));
+			balls[i].ncy = ball_size - balls[i].ncy + ball_size; 
+			balls[i].speedy = -balls[i].speedy*RESTITUTION_S;
+		}
+		if(balls[i].ncy > SIZE_Y - ball_size){
+			//bounce off bottom cushon
+			ts[balls.length * balls.length + i] = (balls[i].speedy / (SIZE_Y - ball_size - cy));
+			balls[i].ncy = (SIZE_Y - ball_size) - (balls[i].ncy -(SIZE_Y - ball_size));
+			balls[i].speedy = -balls[i].speedy*RESTITUTION_S;	
+		}
+	}
+	
+	//TODO find smallest t
+	//smallestt = 2;//all ts between 0 and 1
+	//TODO
+				//if(ts[i*balls.length + j] < smallestt){
+				//	smallesti = i;
+				//	smallestj = j;
+				//	smallestt = ts[i*balls.length + j];
+				//}
+				
+	
+	//perform collision and find end points + speeds of balls
+	for(i = 0; i < balls.length; i++){
+		for(j = 0; j < i; j++){
+			if(collisions[i*balls.length + j] == 1){
+				var t = ts[i*balls.length + j];
+				if(t == 0){
+					continue;
+				}
+				var ball1 = balls[i];
+				var ball2 = balls[j];
+				var cx11 = parseFloat(ball1.getAttribute("cx"),10);
+				var cy11 = parseFloat(ball1.getAttribute("cy"),10);
+				var cx21 = parseFloat(ball2.getAttribute("cx"),10);
+				var cy21 = parseFloat(ball2.getAttribute("cy"),10);
+				var cx12 = ball1.speedx;
+				var cy12 = ball1.speedy;
+				var cx22 = ball2.speedx;
+				var cy22 = ball2.speedy;
+				var px1 = cx11 + t*cx12;//positions of balls at collision
+				var py1 = cy11 + t*cy12;
+				var px2 = cx21 + t*cx22;
+				var py2 = cy21 + t*cy22;
+				var dist = Math.sqrt(Math.pow(px1 - px2,2) + Math.pow(py1 - py2,2));
+				var contAngle = Math.atan2((py2 - py1) , (px2 - px1));
+				//alert("Positions: (x1,y1),(x2,y2) = ("+px1+","+py1+"),("+px2+","+py2+") angle = "+contAngle+", dist = "+dist+" t = "+t);
+				//FIX THIS 
+				var theta1 = Math.atan2(ball1.speedy,ball1.speedx); //Math.atan(ball1.speedy/ball1.speedx);//if speedx = 0 this breaks!
+				var theta2 = Math.atan2(ball2.speedy,ball2.speedx); //Math.atan(ball2.speedy/ball2.speedx);
+				//alert("theta1 = "+theta1+",theta2 = "+theta2);
+				var u1 = Math.sqrt(Math.pow(ball1.speedx,2) + Math.pow(ball1.speedy,2));
+				var u2 = Math.sqrt(Math.pow(ball2.speedx,2) + Math.pow(ball2.speedy,2));
+				var v1x = u2*Math.cos(theta2 - contAngle)*Math.cos(contAngle)*RESTITUTION + 
+					u1*Math.sin(theta1 - contAngle)*Math.cos(contAngle + (Math.PI/2)/*degrees? radii?*/);
+				var v1y = u2*Math.cos(theta2 - contAngle)*Math.sin(contAngle)*RESTITUTION + 
+					u1*Math.sin(theta1 - contAngle)*Math.sin(contAngle + (Math.PI/2)/*degrees? radii?*/);
+				var v2x = u1*Math.cos(theta1 - contAngle)*Math.cos(contAngle)*RESTITUTION + 
+					u2*Math.sin(theta2 - contAngle)*Math.cos(contAngle + (Math.PI/2)/*degrees? radii?*/);
+				var v2y = u1*Math.cos(theta1 - contAngle)*Math.sin(contAngle)*RESTITUTION + 
+					u2*Math.sin(theta2 - contAngle)*Math.sin(contAngle + (Math.PI/2)/*degrees? radii?*/);
+				ball1.speedx = v1x;
+				ball1.speedy = v1y;
+				ball2.speedx = v2x;
+				ball2.speedy = v2y;
+				ball1.ncx = px1 + (1-t)*ball1.speedx;
+				ball1.ncy = py1 + (1-t)*ball1.speedy;
+				ball2.ncx = px2 + (1-t)*ball2.speedx;
+				ball2.ncy = py2 + (1-t)*ball2.speedy;
+				var ball1str = ballToString(ball1);
+				var ball2str = ballToString(ball2);
+				//alert("ball1: "+ball1str+"\nball2: "+ball2str+"\n contact angle = "+contAngle);
+				var dist2 = Math.sqrt(Math.pow(ball1.ncx-ball2.ncx,2) + Math.pow(ball1.ncy-ball2.ncy,2));
+				if(dist2 < ball_size*2){
+			//		alert("Error! balls have not escaped one another!");
+				}
+			}
+		}
+	}
+	
+	for(i = 0; i < balls.length; i++){
+		balls[i].setAttribute("cx",balls[i].ncx);
+		balls[i].setAttribute("cy",balls[i].ncy);
+	}
+	friction();
+}
+
+//take a shot (give the white ball an initial speed)
+function shoot(px,py){
+	
+}
+
+function mouseDown(){
+	pressTime = 0;
+	startPress = (new Date()).getTime();
+}
+
+function mouseUp(){
+	if(startPress != 0){
+		pressTime = (new Date()).getTime() - startPress;
+		startPress = 0;
+		alert("presstime = "+pressTime+"ms");
+	}
+}
+
+
+init();
+setInterval(function(){animate();},1000/FPS);

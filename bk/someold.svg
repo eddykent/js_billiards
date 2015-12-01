@@ -1,0 +1,90 @@
+<circle cx="20" cy="20" r="'+ball_size+'" id="ball-1" fill="white" mask="url(#mask1)"/>\
+<circle cx="400" cy="310" r="'+ball_size+'" id="ball0" class="billiardballcircle"/>\
+<circle cx="200" cy="290" r="'+ball_size+'" id="ball1" class="billiardballcircle" />\
+<circle cx="200" cy="330" r="'+ball_size+'" id="ball2" class="billiardballcircle" />\
+<circle cx="235" cy="310" r="'+ball_size+'" id="ball3" class="billiardballcircle" />\
+<circle cx="165" cy="270" r="'+ball_size+'" id="ball4" class="billiardballcircle" />\
+<circle cx="165" cy="350" r="'+ball_size+'" id="ball5" class="billiardballcircle" />\
+<circle cx="165" cy="310" r="'+ball_size+'" id="ball6" class="billiardballcircle" />\
+<circle cx="130" cy="250" r="'+ball_size+'" id="ball7" class="billiardballcircle" />\
+<circle cx="130" cy="370" r="'+ball_size+'" id="ball8" class="billiardballcircle" />\
+<circle cx="130" cy="290" r="'+ball_size+'" id="ball9" class="billiardballcircle" />\
+<circle cx="130" cy="330" r="'+ball_size+'" id="ball10" class="billiardballcircle" />\
+<circle cx="95" cy="230" r="'+ball_size+'" id="ball11" class="billiardballcircle" />\
+<circle cx="95" cy="270" r="'+ball_size+'" id="ball12" class="billiardballcircle" />\
+<circle cx="95" cy="310" r="'+ball_size+'" id="ball13" class="billiardballcircle" />\
+<circle cx="95" cy="350" r="'+ball_size+'" id="ball14" class="billiardballcircle" />\
+<circle cx="95" cy="390" r="'+ball_size+'" id="ball15" class="billiardballcircle" />\
+<circle cx="400" cy="310" r="'+ball_size/2+'" id="ballcentre0" class="billiardballcirclecentre" />\
+<circle cx="200" cy="290" r="'+ball_size/2+'" id="ballcentre1" class="billiardballcirclecentre" />\
+<circle cx="200" cy="330" r="'+ball_size/2+'" id="ballcentre2" class="billiardballcirclecentre" />\
+<circle cx="235" cy="310" r="'+ball_size/2+'" id="ballcentre3" class="billiardballcirclecentre" />\
+<circle cx="165" cy="270" r="'+ball_size/2+'" id="ballcentre4" class="billiardballcirclecentre" />\
+<circle cx="165" cy="350" r="'+ball_size/2+'" id="ballcentre5" class="billiardballcirclecentre" />\
+<circle cx="165" cy="310" r="'+ball_size/2+'" id="ballcentre6" class="billiardballcirclecentre" />\
+<circle cx="130" cy="250" r="'+ball_size/2+'" id="ballcentre7" class="billiardballcirclecentre" />\
+<circle cx="130" cy="370" r="'+ball_size/2+'" id="ballcentre8" class="billiardballcirclecentre" />\
+<circle cx="130" cy="290" r="'+ball_size/2+'" id="ballcentre9" class="billiardballcirclecentre" />\
+<circle cx="130" cy="330" r="'+ball_size/2+'" id="ballcentre10" class="billiardballcirclecentre" />\
+<circle cx="95" cy="230" r="'+ball_size/2+'" id="ballcentre11" class="billiardballcirclecentre" />\
+<circle cx="95" cy="270" r="'+ball_size/2+'" id="ballcentre12" class="billiardballcirclecentre" />\
+<circle cx="95" cy="310" r="'+ball_size/2+'" id="ballcentre13" class="billiardballcirclecentre" />\
+<circle cx="95" cy="350" r="'+ball_size/2+'" id="ballcentre14" class="billiardballcirclecentre" />\
+<circle cx="95" cy="390" r="'+ball_size/2+'" id="ballcentre15" class="billiardballcirclecentre" />\
+<text x="400" y="310" fill="white" id="balltext0" transform="translate(-5,-5)" class="billiardballcircletext"></text>\
+<text x="200" y="290" fill="black" id="balltext1" transform="translate(-5,5)" class="billiardballcircletext">1</text>\
+<text x="200" y="330" fill="black" id="balltext2" transform="translate(-5,5)" class="billiardballcircletext">2</text>\
+<text x="235" y="310" fill="black" id="balltext3" transform="translate(-5,5)" class="billiardballcircletext">3</text>\
+<text x="165" y="270" fill="black" id="balltext4" transform="translate(-5,5)" class="billiardballcircletext">4</text>\
+<text x="165" y="350" fill="black" id="balltext5" transform="translate(-5,5)" class="billiardballcircletext">5</text>\
+<text x="165" y="310" fill="black" id="balltext6" transform="translate(-5,5)" class="billiardballcircletext">6</text>\
+<text x="130" y="250" fill="black" id="balltext7" transform="translate(-5,5)" class="billiardballcircletext">7</text>\
+<text x="130" y="370" fill="black" id="balltext8" transform="translate(-5,5)" class="billiardballcircletext">8</text>\
+<text x="130" y="290" fill="black" id="balltext9" transform="translate(-5,5)" class="billiardballcircletext">9</text>\
+<text x="130" y="330" fill="black" id="balltext10" transform="translate(-9,5)" class="billiardballcircletext">10</text>\
+<text x="95" y="230" fill="black" id="balltext11" transform="translate(-9,5)" class="billiardballcircletext">11</text>\
+<text x="95" y="270" fill="black" id="balltext12" transform="translate(-9,5)" class="billiardballcircletext">12</text>\
+<text x="95" y="310" fill="black" id="balltext13" transform="translate(-9,5)" class="billiardballcircletext">13</text>\
+<text x="95" y="350" fill="black" id="balltext14" transform="translate(-9,5)" class="billiardballcircletext">14</text>\
+<text x="95" y="390" fill="black" id="balltext15" transform="translate(-9,5)" class="billiardballcircletext">15</text>\
+<circle cx="130" cy="290" r="'+ball_size+'" id="ball9stripewhite" class="billiardballcirclewhite" />\
+<circle cx="130" cy="330" r="'+ball_size+'" id="ball10stripewhite" class="billiardballcirclewhite" />\
+<circle cx="95" cy="230" r="'+ball_size+'" id="ball11stripewhite" class="billiardballcirclewhite" />\
+<circle cx="95" cy="270" r="'+ball_size+'" id="ball12stripewhite" class="billiardballcirclewhite" />\
+<circle cx="95" cy="310" r="'+ball_size+'" id="ball13stripewhite" class="billiardballcirclewhite" />\
+<circle cx="95" cy="350" r="'+ball_size+'" id="ball14stripewhite" class="billiardballcirclewhite" />\
+<circle cx="95" cy="390" r="'+ball_size+'" id="ball15stripewhite" class="billiardballcirclewhite" />\
+	<defs>\
+	<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask9" >\
+		<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+	</mask>\
+	<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask10" >\
+		<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+	</mask>\
+	<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask11" >\
+		<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+	</mask>\
+	<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask12" >\
+		<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+	</mask>\
+	<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask13" >\
+		<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+	</mask>\
+	<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask14" >\
+		<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+	</mask>\
+	<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask15" >\
+		<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+	</mask>\
+	<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="mask1" >\
+		<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+	</mask>\
+</defs>\

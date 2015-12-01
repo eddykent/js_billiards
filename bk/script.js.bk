@@ -1,0 +1,617 @@
+//some physical constants for dis shiz
+const FRICTION = 0;//friction coefficient to slow down balls each frame
+const RESTITUTION = 1.0;//coefficient of restitution for ball collisions
+const RESTITUTION_S = 1.0;//coeff restitution of balls on cushon
+const FPS = 100;//frames per second
+const SIZE_X = 800;//size of the table
+const SIZE_Y = 600;
+const ball_size = 20;//size of the balls
+const dbalerts = 0;
+const ballColours = new Array("white","yellow","darkblue","red","purple","orange","darkgreen","brown","black","yellow","darkblue","red","purple","orange","darkgreen","brown");
+
+var container;//div the table is drawn in
+
+//stuff for calculating power of shot
+var pressTime = 0;
+var startPress = 0;
+
+//the balls themselves, these are just svg circle elements with additional properties
+var balls = new Array();
+
+//stuff for calculating collision mechanics and for saving calculations where possible
+var collisions = new Array();
+var ts = new Array();
+
+function myalert(str){
+	if(dbalerts == 1){
+		alert(str);
+	}
+}
+
+function assert(prop,message){
+	if(prop == false){
+		alert(message);
+	}
+}
+
+//set a new position of a ball
+function setBallPosition(ball,x,y){
+	ball.setAttribute("cx",x);
+	ball.setAttribute("cy",y);
+	ball.centre.setAttribute("cx",x);
+	ball.centre.setAttribute("cy",y);
+	ball.text.setAttribute("x",x);
+	ball.text.setAttribute("y",y);
+	if(ball.number > 8){
+		//set stripe masks
+		ball.stripewhite.setAttribute("cx",x);
+		ball.stripewhite.setAttribute("cy",y);
+		ball.stripemask.setAttribute("x",x-ball_size);
+		ball.stripemask.setAttribute("y",y-ball_size);
+		ball.stripemask.rect1.setAttribute("x",x-ball_size);
+		ball.stripemask.rect1.setAttribute("y",y-ball_size);
+		ball.stripemask.rect2.setAttribute("x",x-ball_size)
+		ball.stripemask.rect2.setAttribute("y",y+(2/3)*ball_size);
+	}
+}
+
+//initialise table + balls
+//firstly, place a pool table looking thing inside the div container.
+//second, draw a bunch of balls and store their references into an array
+//thirdly, give the balls some additional data such as their speeds and  directions
+function init(){
+	//TODO: use DOM tools instead of inputting text as it's "bad practise" 
+	var container = document.getElementById("pooltable");
+	//container.addElement("svg");
+	/*
+	 * <circle cx="120" cy="150" r="'+ball_size+'" fill="purple" id="purpleball" />\
+	<circle cx="120" cy="180" r="'+ball_size+'" fill="brown" id="brownball" />\
+	<circle cx="90" cy="180" r="'+ball_size+'" fill="pink" id="pinkball" />\
+	<circle cx="60" cy="100" r="'+ball_size+'" fill="orange" id="orangeball" />\
+	<circle cx="20" cy="100" r="'+ball_size+'" fill="green" id="greenball" />\
+	<circle cx="60" cy="160" r="'+ball_size+'" fill="yellow" id="yellowball" />\*/
+	
+	/*	<circle cx="70" cy="135" r="'+ball_size+'" fill="blue" id="blueball" />\
+		<circle cx="110" cy="105" r="'+ball_size+'" fill="red" id="redball" />\ */
+	
+	container.innerHTML = '<svg width="'+SIZE_X+'" height="'+SIZE_Y+'" id="table" >\
+	<rect x="0" y="0" width="'+SIZE_X+'" height="'+SIZE_Y+'" fill="green" />\
+	<circle cx="20" cy="20" r="'+ball_size+'" id="ball-1" fill="white" mask="url(#mask1)"/>\
+	<circle cx="400" cy="310" r="'+ball_size+'" id="ball0" class="billiardballcircle"/>\
+	<circle cx="200" cy="290" r="'+ball_size+'" id="ball1" class="billiardballcircle" />\
+	<circle cx="200" cy="330" r="'+ball_size+'" id="ball2" class="billiardballcircle" />\
+	<circle cx="235" cy="310" r="'+ball_size+'" id="ball3" class="billiardballcircle" />\
+	<circle cx="165" cy="270" r="'+ball_size+'" id="ball4" class="billiardballcircle" />\
+	<circle cx="165" cy="350" r="'+ball_size+'" id="ball5" class="billiardballcircle" />\
+	<circle cx="165" cy="310" r="'+ball_size+'" id="ball6" class="billiardballcircle" />\
+	<circle cx="130" cy="250" r="'+ball_size+'" id="ball7" class="billiardballcircle" />\
+	<circle cx="130" cy="370" r="'+ball_size+'" id="ball8" class="billiardballcircle" />\
+	<circle cx="130" cy="290" r="'+ball_size+'" id="ball9" class="billiardballcircle" />\
+	<circle cx="130" cy="330" r="'+ball_size+'" id="ball10" class="billiardballcircle" />\
+	<circle cx="95" cy="230" r="'+ball_size+'" id="ball11" class="billiardballcircle" />\
+	<circle cx="95" cy="270" r="'+ball_size+'" id="ball12" class="billiardballcircle" />\
+	<circle cx="95" cy="310" r="'+ball_size+'" id="ball13" class="billiardballcircle" />\
+	<circle cx="95" cy="350" r="'+ball_size+'" id="ball14" class="billiardballcircle" />\
+	<circle cx="95" cy="390" r="'+ball_size+'" id="ball15" class="billiardballcircle" />\
+	<circle cx="400" cy="310" r="'+ball_size/2+'" id="ballcentre0" class="billiardballcirclecentre" />\
+	<circle cx="200" cy="290" r="'+ball_size/2+'" id="ballcentre1" class="billiardballcirclecentre" />\
+	<circle cx="200" cy="330" r="'+ball_size/2+'" id="ballcentre2" class="billiardballcirclecentre" />\
+	<circle cx="235" cy="310" r="'+ball_size/2+'" id="ballcentre3" class="billiardballcirclecentre" />\
+	<circle cx="165" cy="270" r="'+ball_size/2+'" id="ballcentre4" class="billiardballcirclecentre" />\
+	<circle cx="165" cy="350" r="'+ball_size/2+'" id="ballcentre5" class="billiardballcirclecentre" />\
+	<circle cx="165" cy="310" r="'+ball_size/2+'" id="ballcentre6" class="billiardballcirclecentre" />\
+	<circle cx="130" cy="250" r="'+ball_size/2+'" id="ballcentre7" class="billiardballcirclecentre" />\
+	<circle cx="130" cy="370" r="'+ball_size/2+'" id="ballcentre8" class="billiardballcirclecentre" />\
+	<circle cx="130" cy="290" r="'+ball_size/2+'" id="ballcentre9" class="billiardballcirclecentre" />\
+	<circle cx="130" cy="330" r="'+ball_size/2+'" id="ballcentre10" class="billiardballcirclecentre" />\
+	<circle cx="95" cy="230" r="'+ball_size/2+'" id="ballcentre11" class="billiardballcirclecentre" />\
+	<circle cx="95" cy="270" r="'+ball_size/2+'" id="ballcentre12" class="billiardballcirclecentre" />\
+	<circle cx="95" cy="310" r="'+ball_size/2+'" id="ballcentre13" class="billiardballcirclecentre" />\
+	<circle cx="95" cy="350" r="'+ball_size/2+'" id="ballcentre14" class="billiardballcirclecentre" />\
+	<circle cx="95" cy="390" r="'+ball_size/2+'" id="ballcentre15" class="billiardballcirclecentre" />\
+	<text x="400" y="310" fill="white" id="balltext0" transform="translate(-5,-5)" class="billiardballcircletext"></text>\
+	<text x="200" y="290" fill="black" id="balltext1" transform="translate(-5,5)" class="billiardballcircletext">1</text>\
+	<text x="200" y="330" fill="black" id="balltext2" transform="translate(-5,5)" class="billiardballcircletext">2</text>\
+	<text x="235" y="310" fill="black" id="balltext3" transform="translate(-5,5)" class="billiardballcircletext">3</text>\
+	<text x="165" y="270" fill="black" id="balltext4" transform="translate(-5,5)" class="billiardballcircletext">4</text>\
+	<text x="165" y="350" fill="black" id="balltext5" transform="translate(-5,5)" class="billiardballcircletext">5</text>\
+	<text x="165" y="310" fill="black" id="balltext6" transform="translate(-5,5)" class="billiardballcircletext">6</text>\
+	<text x="130" y="250" fill="black" id="balltext7" transform="translate(-5,5)" class="billiardballcircletext">7</text>\
+	<text x="130" y="370" fill="black" id="balltext8" transform="translate(-5,5)" class="billiardballcircletext">8</text>\
+	<text x="130" y="290" fill="black" id="balltext9" transform="translate(-5,5)" class="billiardballcircletext">9</text>\
+	<text x="130" y="330" fill="black" id="balltext10" transform="translate(-9,5)" class="billiardballcircletext">10</text>\
+	<text x="95" y="230" fill="black" id="balltext11" transform="translate(-9,5)" class="billiardballcircletext">11</text>\
+	<text x="95" y="270" fill="black" id="balltext12" transform="translate(-9,5)" class="billiardballcircletext">12</text>\
+	<text x="95" y="310" fill="black" id="balltext13" transform="translate(-9,5)" class="billiardballcircletext">13</text>\
+	<text x="95" y="350" fill="black" id="balltext14" transform="translate(-9,5)" class="billiardballcircletext">14</text>\
+	<text x="95" y="390" fill="black" id="balltext15" transform="translate(-9,5)" class="billiardballcircletext">15</text>\
+	<circle cx="130" cy="290" r="'+ball_size+'" id="ball9stripewhite" class="billiardballcirclewhite" />\
+	<circle cx="130" cy="330" r="'+ball_size+'" id="ball10stripewhite" class="billiardballcirclewhite" />\
+	<circle cx="95" cy="230" r="'+ball_size+'" id="ball11stripewhite" class="billiardballcirclewhite" />\
+	<circle cx="95" cy="270" r="'+ball_size+'" id="ball12stripewhite" class="billiardballcirclewhite" />\
+	<circle cx="95" cy="310" r="'+ball_size+'" id="ball13stripewhite" class="billiardballcirclewhite" />\
+	<circle cx="95" cy="350" r="'+ball_size+'" id="ball14stripewhite" class="billiardballcirclewhite" />\
+	<circle cx="95" cy="390" r="'+ball_size+'" id="ball15stripewhite" class="billiardballcirclewhite" />\
+		<defs>\
+		<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask9" >\
+			<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+			<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		</mask>\
+		<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask10" >\
+			<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+			<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		</mask>\
+		<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask11" >\
+			<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+			<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		</mask>\
+		<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask12" >\
+			<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+			<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		</mask>\
+		<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask13" >\
+			<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+			<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		</mask>\
+		<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask14" >\
+			<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+			<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		</mask>\
+		<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="billiardballstripemask15" >\
+			<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+			<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		</mask>\
+		<mask x="0" y="0" width="'+(2*ball_size)+'" height="'+(2*ball_size)+'" id="mask1" >\
+			<rect x="0" y="0" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+			<rect x="0" y="'+((5/3)*ball_size)+'" width="'+(2*ball_size)+'" height="'+(ball_size/3)+'" fill="white" />\
+		</mask>\
+	</defs>\
+	</svg>';
+	var table = container.getElementsByTagName("svg")[0];
+	table.addEventListener("mousedown",function(evt){mouseDown(evt);});
+	table.addEventListener("mouseup",function(evt){mouseUp(evt);});
+/*	balls[0] = document.getElementById("whiteball");//sticks together
+	balls[0].speedx = 0;//causes problem when balls are at 0 or low speeds
+	balls[0].speedy = 0; //y direction is at 0 radii
+	balls[0].ncx = 0.0;
+	balls[0].ncy = 0.0;
+	balls[1] = document.getElementById("blackball");
+	balls[1].speedx = 0;
+	balls[1].speedy = 0;
+	balls[1].ncx = 0.0;
+	balls[1].ncx = 0.0;
+	balls[2] = document.getElementById("blueball");
+	balls[2].speedx = 0;
+	balls[2].speedy = 0;
+	balls[3] = document.getElementById("redball");
+	balls[3].speedx = 0;
+	balls[3].speedy = 0;*/
+	balls = document.getElementsByClassName("billiardballcircle");
+	var bcentres = document.getElementsByClassName("billiardballcirclecentre");
+	var btexts = document.getElementsByClassName("billiardballcircletext");
+	var bstripewhites = document.getElementsByClassName("billiardballcirclewhite");
+	var masks = table.getElementsByTagName("mask");
+	for(var i = 0; i < balls.length; i++){
+		balls[i].speedx = 0;
+		balls[i].speedy = 0;
+		balls[i].ncx = 0.0;
+		balls[i].ncx = 0.0;
+		balls[i].setAttribute("fill",ballColours[i]);
+		balls[i].centre = bcentres[i];
+		balls[i].centre.setAttribute("fill","white");
+		balls[i].text = btexts[i];
+		balls[i].number = i;
+		if(i > 8){
+			balls[i].stripewhite = bstripewhites[i-9];
+			balls[i].stripewhite.setAttribute("fill","white");
+			balls[i].stripemask = masks[i-9];
+			balls[i].stripewhite.setAttribute("mask","url(#"+balls[i].stripemask.getAttribute("id")+")");
+			var rects = balls[i].stripemask.getElementsByTagName("rect");
+			balls[i].stripemask.rect1 = rects[0];
+			balls[i].stripemask.rect2 = rects[1];
+		}
+		setBallPosition(balls[i],balls[i].getAttribute("cx"),balls[i].getAttribute("cy"));
+	}
+	balls[0].speedx = 1;
+	
+}
+
+function friction(){
+	var f = 1.0-FRICTION;
+	for(var i = 0; i < balls.length; i++){
+		balls[i].speedx = f*balls[i].speedx;
+		balls[i].speedy = f*balls[i].speedy;
+		if(Math.pow(balls[i].speedx,2) + Math.pow(balls[i].speedy,2) < FRICTION){
+			balls[i].speedx = 0;
+			balls[i].speedy = 0;
+		} 
+	}
+}
+
+function ballToString(ball){
+	var cx = parseFloat(ball.getAttribute("cx"),10);
+	var cy = parseFloat(ball.getAttribute("cy"),10);
+	var str = ball.getAttribute("id")+": old=("+cx+","+cy+"), new=("+ball.ncx+","+ball.ncy+"), speed=("+ball.speedx+","+ball.speedy+
+			"), pos=("+ball.px+","+ball.py+"), fs=("+ball.pspeedx+","+ball.pspeedy+")";
+	return str;
+}
+
+function testbounds(t){
+	for(var i = 0; i < balls.length; i++){
+		var cx = parseFloat(balls[i].getAttribute("cx"),10);
+		var cy = parseFloat(balls[i].getAttribute("cy"),10);
+		if(cx < ball_size){
+			alert("fail: tbreak="+t+", "+ballToString(balls[i]));
+		}
+		if(cx > SIZE_X - ball_size){
+			alert("fail: tbreak="+t+", "+ballToString(balls[i]));
+		}
+		if(cy < ball_size){
+			alert("fail: tbreak="+t+", "+ballToString(balls[i]));
+		}
+		if(cy > SIZE_Y - ball_size){
+			alert("fail: tbreak="+t+", "+ballToString(balls[i]));
+		}
+	}
+}
+
+//make balls move (and collide) according to their speeds and directions
+function animate(){
+	
+	var smallestt = 0;//used in calculating next collision in frame
+	var smallesti = 0;//if two collisions happen at similar times these 
+	var smallestj = 0;//variables can be used to calculate the outcome of all
+	var tbreak = 0;//time of last collision 
+	var collide = 1;
+	var pcollide = 0;
+	var lasti = -1;
+	var lastj = -1;
+	var i = 0;
+	var j = 0;
+	var tick = 0;
+	for(i = 0; i < balls.length; i++){//initial start positions and speeds
+		balls[i].px = parseFloat(balls[i].getAttribute("cx"),10);
+		balls[i].py = parseFloat(balls[i].getAttribute("cy"),10);
+		balls[i].pspeedx = balls[i].speedx;
+		balls[i].pspeedy = balls[i].speedy;
+		balls[i].ncx = balls[i].px + balls[i].pspeedx;//current partframe position + part speed
+		balls[i].ncy = balls[i].py + balls[i].pspeedy;	
+	}
+	
+	while(collide == 1 && tbreak < 1.0){
+		if(tick > 0){
+			pcollide = collide;
+		}
+		tick++;
+		collide = 0;
+		smallestt = 0;
+		smallesti = 0;
+		smallestj = 0;
+		//reset collision matrix
+		for(i = 0; i <= balls.length; i++){
+			for(j = 0; j < balls.length; j++){
+				collisions[i*balls.length + j] = 0;
+				ts[i*balls.length + j] = 2;
+			}
+		}
+		
+		
+		//collision detection - detect if two balls collide and ammend their new speeds and places if they do. 
+		//todo: two balls is perhaps not accurate enough! - how to fix? faster framerate?
+		//first: work out where the balls end up in the next frame.
+		//Get their speeds and their distances from eachother. if they are not able to collide in this frame they can be ignored
+		//Next, test if they actually collide. If they don't, ignore them for this frame. 
+		//Find the time of the collision and angle of contact on the balls to work out the energy transfer.
+		//Update the new positions and the new speeds and repeat until all collisions have been accounted for
+		
+		//objective: Work out the new place for next frame:
+/*		for(i = 0; i < balls.length; i++){
+			balls[i].ncx = balls[i].px + balls[i].pspeedx;//current partframe position + part speed
+			balls[i].ncy = balls[i].py + balls[i].pspeedy;
+		}*/
+		
+		//test their speed and position for possible collisions
+		//if two balls speeds are larger than their distance from eachother, they may collide in this frame
+		for(i = 0; i < balls.length; i++){
+			var cx1 = balls[i].px;//lucky this is stored as a float!
+			var cy1 = balls[i].py;
+			var speed1 = Math.sqrt(Math.pow(balls[i].pspeedx,2) + Math.pow(balls[i].pspeedy,2));
+
+			for(j = 0; j < i; j++){
+				var cx2 = parseFloat(balls[j].getAttribute("cx"),10);//lucky this is stored as a float!
+				var cy2 = parseFloat(balls[j].getAttribute("cy"),10);
+			
+				var dist = Math.sqrt(Math.pow(cx1 - cx2,2) + Math.pow(cy1 - cy2,2));
+				var speed2 = Math.sqrt(Math.pow(balls[j].pspeedx,2) + Math.pow(balls[j].pspeedy,2));
+				if(dist <= speed1 + speed2 + ball_size*2){
+					//Potential collision
+					collisions[i*balls.length + j] = 1;
+					collisions[j*balls.length + i] = 1;
+				}
+			}
+		}
+		
+		//Get the point of contact and the value of t that they collided at distance d to work out new positions and speeds
+		//METHOD: put lines into form r = a + tb. then dist(a1 + tb1 , a2+tb2), where a1 = (x11,y11), b1 = (x12,y12), 
+		//a2 = (x21,y21), b2 = (x22,y22). thus, sqrt(((x11 + tx12) - (x21 - tx22))^2 + ((y11 + ty12) - (y21 - ty22))^2) = d
+		// ** + square both sides of =
+		//=> ((x11 - x21) +t(x12 - x22))^2 + ((y11 - y21) +t(y12 - y22))^2 = d^2
+		// ** more re arrangement gives a nice quad of at^2 + bt + c = d^2. 
+		for(i = 0; i < balls.length; i++){
+			for(j = 0; j < balls.length; j++){
+			//	if(collisions[i*balls.length + j] == 1){
+					var bcxi = balls[i].px;
+					var bcxj = balls[j].px;
+					var bcyi = balls[i].py;
+					var bcyj = balls[j].py;
+					//give values (some magic i worked out here :) )
+					var n1 = bcxi - bcxj;//ax1 = cx(i), bx1 = cx(j), ax2 = ncx(i) - cx(i), bx2 =
+					var n3 = bcyi - bcyj;
+					var n2 = (balls[i].ncx - bcxi) -  (balls[j].ncx - bcxj);
+					var n4 = (balls[i].ncy - bcyi) -  (balls[j].ncy - bcyj);
+					var a = (n2*n2) + (n4*n4);
+					var b = 2*(n1*n2 + n3*n4);
+					var c = (n1*n1) + (n3*n3) - (4*ball_size*ball_size);
+					var det = Math.pow(b,2) - 4*a*c;
+					//myalert(a+"t^2 + "+b+"t + "+c+", det="+det);
+					//quad eq to find t with a,b and c
+					if(det <= 0){
+						//balls don't collide - no intersection point
+						collisions[i*balls.length + j] = 0;
+						collisions[j*balls.length + i] = 0;
+					}else{
+						//find their collision point (smallest positive) since t = time :D
+						var t = 0; 
+						var t1 = (-b - Math.sqrt(Math.pow(b,2) - 4*a*c))/(2*a);
+						t = t1;
+	//					var t2 = (-b + Math.sqrt(Math.pow(b,2) - 4*a*c))/(2*a);
+/*						var tt1 = 3;
+						var tt2 = 3;
+						if(t1 > 0){
+							tt1 = t1;
+						}
+						if(t2 > 0){
+							tt2 = t2;
+						}
+						t = tt1 < tt2 ? tt1 : tt2;*/
+						//myalert("t1 = "+t1+", t2 = "+t2+", t = "+t);
+						if(t < 1 && t >= 0){
+							//collision point
+							ts[i*balls.length + j] = t;
+							ts[j*balls.length + i] = t;
+							collide = 1;//collision has happened here
+						}else{
+							//no collision in this particular frame
+							collisions[i*balls.length + j] = 0;
+							collisions[j*balls.length + i] = 0;
+						}
+					}
+			//	}
+			}
+		}
+		
+		//detect wall bounces
+		for(i = 0; i < balls.length; i++){
+			//myalert(ball);
+			var cx = balls[i].px;
+			var cy = balls[i].py;
+			balls[i].ncx = cx+balls[i].pspeedx;//the remaining frame speed
+			balls[i].ncy = cy+balls[i].pspeedy;
+			if(balls[i].ncx < 0.0 + ball_size){
+				//bounce off left cushon
+				//find t for comparing collisions
+				ts[balls.length * balls.length + i] = (Math.abs(cx - ball_size)/Math.abs(balls[i].pspeedx));
+				collide = 1;
+			}else 
+			if(balls[i].ncx > SIZE_X - ball_size){
+				//bounce off right cushon
+				ts[balls.length * balls.length + i] = (Math.abs(SIZE_X - ball_size - cx)/Math.abs(balls[i].pspeedx));
+				collide = 1;
+			}else 
+			if(balls[i].ncy < 0.0 + ball_size){
+				//bounce off top cushon	
+				ts[balls.length * balls.length + i] = (Math.abs(cy - ball_size)/Math.abs(balls[i].pspeedy));
+				collide = 1;
+			}else 
+			if(balls[i].ncy > SIZE_Y - ball_size){
+				//bounce off bottom cushon
+				ts[balls.length * balls.length + i] = (Math.abs(SIZE_Y - ball_size - cy)/Math.abs(balls[i].pspeedy));
+				collide = 1;
+			}
+		}
+	
+		//find smallest t
+		//set a centre point for all balls once smallest collision has been found and use this each calculation
+		smallestt = 2;//all ts between 0 and 1
+		for(i = 0; i <= balls.length; i++){
+			for(j = 0; j < balls.length; j++){
+				if(ts[i*balls.length + j] < smallestt && ts[i*balls.length + j] >= 0 && i != lasti && j != lastj ){
+					smallesti = i;
+					smallestj = j;
+					smallestt = ts[i*balls.length + j];
+				}
+			}
+		}
+		lasti = smallesti;
+		lastj = smallestj;		
+		if(smallestt > 1 || smallestt < 0 || collide == 0){
+		//	myalert("smallest t bigger than 1! = "+smallestt);
+			break;//exit loop correcting speeds and positions
+		}
+		
+		tbreak += (1-tbreak)*smallestt;//last point in time a collision began (from 0 to 1 between frames)
+		if(tbreak < 0 || tbreak > 1){
+			alert("tbreak wrong, = "+tbreak);
+		}
+		for(i = 0; i < balls.length; i++){
+			balls[i].px = balls[i].px + balls[i].pspeedx*smallestt;
+			balls[i].py = balls[i].py + balls[i].pspeedy*smallestt;
+			balls[i].pspeedx = balls[i].pspeedx*(1-smallestt);
+			balls[i].pspeedy = balls[i].pspeedy*(1-smallestt);
+			balls[i].ncx = balls[i].px + balls[i].pspeedx;
+			balls[i].ncy = balls[i].py + balls[i].pspeedy;
+		}
+		
+		
+		if(smallesti == balls.length){//bounced off side
+			//perform wall bounces
+			//when the ball hits into a cushon, this corrects where it will be on the next frame
+			//For example:  
+			//      table width is 100
+			//	ball radius is 5
+			//	position x = 94 
+			//	speed x = 8
+			// THEN: boundary = 100-5, new position x = 102
+			// BUT 102 is 7 bigger than 95 so it has moved backwards by -7
+			// new position = 95 - 7
+			//in the next frame it must be at 88 heading in the opposite direction (since it bounced between frames) 
+			if(balls[smallestj].ncx < 0 + ball_size){
+				//bounce off left cushon=
+				//find t for comparing collisions
+				balls[smallestj].pspeedx = balls[smallestj].pspeedx*RESTITUTION_S*(-1);
+				balls[smallestj].px = 0 + ball_size;
+				balls[smallestj].ncx = ball_size + balls[smallestj].pspeedx;
+				if(balls[smallestj].ncx < ball_size){
+					alert("new x position of "+balls[smallestj].getAttribute("id")+
+					" too small, "+balls[smallestj].ncx);
+				}
+			}else
+			if(balls[smallestj].ncx > SIZE_X - ball_size){
+				//bounce off right cushon
+				balls[smallestj].pspeedx = balls[smallestj].pspeedx*RESTITUTION_S*(-1);
+				balls[smallestj].px = SIZE_X - ball_size;
+				balls[smallestj].ncx = balls[smallestj].px + balls[smallestj].pspeedx;
+				if(balls[smallestj].ncx > SIZE_X - ball_size){
+					alert("new x position of "+balls[smallestj].getAttribute("id")+" too big");
+				}
+			}else 
+			if(balls[smallestj].ncy < 0 + ball_size){
+				//bounce off top cushon	
+				balls[smallestj].pspeedy = balls[smallestj].pspeedy*RESTITUTION_S*(-1);
+				balls[smallestj].py = 0 + ball_size;
+				balls[smallestj].ncy = balls[smallestj].py + balls[smallestj].pspeedy;
+				if(balls[smallestj].ncy < ball_size){
+					alert("new y position of "+balls[smallestj].getAttribute("id")+" too small");
+				}
+			}else 
+			if(balls[smallestj].ncy > SIZE_Y - ball_size){
+				//bounce off bottom cushon
+				balls[smallestj].pspeedy = balls[smallestj].pspeedy*RESTITUTION_S*(-1);
+				balls[smallestj].py = SIZE_Y - ball_size;
+				balls[smallestj].ncy = balls[smallestj].py + balls[smallestj].pspeedy;
+				if(balls[smallestj].ncy > SIZE_Y - ball_size){
+					alert("new y position of "+balls[smallestj].getAttribute("id")+" too large");
+				}
+			}
+		}else{
+			//perform collision of smallest point and find end points + speeds of balls
+		//	if(collisions[smallesti*balls.length + smallestj] == 1){
+				var t = smallestt;
+				var ball1 = balls[smallesti];
+				var ball2 = balls[smallestj];
+/*				var cx11 = ball1.px;
+				var cy11 = ball1.py;
+				var cx21 = ball2.px;
+				var cy21 = ball2.py;
+				var cx12 = ball1.pspeedx;
+				var cy12 = ball1.pspeedy;
+				var cx22 = ball2.pspeedx;
+				var cy22 = ball2.pspeedy;*/
+				var px1 = ball1.px;//positions of balls at collision
+				var py1 = ball1.py;
+				var px2 = ball2.px;
+				var py2 = ball2.py;
+	//			var dista = Math.sqrt(Math.pow(ball1.px - ball2.px,2) + Math.pow(ball1.py - ball2.py,2));
+	//			var distb = Math.sqrt(Math.pow(px1 - px2,2) + Math.pow(py1 - py2,2));
+	//			myalert("A = "+dista + ", B = "+distb);
+				var dist = Math.sqrt(Math.pow(px1 - px2,2) + Math.pow(py1 - py2,2));
+				var contAngle = Math.atan2((py2 - py1) , (px2 - px1));
+				myalert("Positions: (x1,y1),(x2,y2) = ("+px1+","+py1+"),("+px2+","+py2+") angle = "+contAngle+", dist = "+dist+" t = "+t);
+				var theta1 = Math.atan2(ball1.pspeedy,ball1.pspeedx); //Math.atan(ball1.speedy/ball1.speedx);//if speedx = 0 this breaks!
+				var theta2 = Math.atan2(ball2.pspeedy,ball2.pspeedx); //Math.atan(ball2.speedy/ball2.speedx);
+				myalert("theta of "+ball1.getAttribute("id")+" = "+theta1+",theta of "+ball2.getAttribute("id")+" = "+theta2);
+				var u1 = Math.sqrt(Math.pow(ball1.pspeedx,2) + Math.pow(ball1.pspeedy,2));
+				myalert("ball2 = "+ballToString(ball2));
+				var u2 = Math.sqrt(Math.pow(ball2.pspeedx,2) + Math.pow(ball2.pspeedy,2));
+				myalert("speeds = 1:("+u1+"), 2:("+u2+")");
+				var v1x = u2*Math.cos(theta2 - contAngle)*Math.cos(contAngle)*RESTITUTION + 
+					u1*Math.sin(theta1 - contAngle)*Math.cos(contAngle + (Math.PI/2));
+				var v1y = u2*Math.cos(theta2 - contAngle)*Math.sin(contAngle)*RESTITUTION + 
+					u1*Math.sin(theta1 - contAngle)*Math.sin(contAngle + (Math.PI/2));
+				var v2x = u1*Math.cos(theta1 - contAngle)*Math.cos(contAngle)*RESTITUTION + 
+					u2*Math.sin(theta2 - contAngle)*Math.cos(contAngle + (Math.PI/2));
+				var v2y = u1*Math.cos(theta1 - contAngle)*Math.sin(contAngle)*RESTITUTION + 
+					u2*Math.sin(theta2 - contAngle)*Math.sin(contAngle + (Math.PI/2));
+				myalert("pos = 1:("+px1+","+py1+") and 2:("+px2+","+py2+")");
+				ball1.pspeedx = v1x;
+				ball1.pspeedy = v1y;
+				ball2.pspeedx = v2x;
+				ball2.pspeedy = v2y;
+				myalert("new speeds = 1:("+ball1.pspeedx+","+ball1.pspeedy+") and 2:("+ball2.pspeedx+","+ball2.pspeedy+")");
+				ball1.ncx = px1 + ball1.pspeedx;
+				ball1.ncy = py1 + ball1.pspeedy;
+				ball2.ncx = px2 + ball2.pspeedx;
+				ball2.ncy = py2 + ball2.pspeedy;
+				myalert("next pos = 1:("+ball1.ncx+","+ball1.ncy+") and 2:("+ball2.ncx+","+ball2.ncy+")");
+				var ball1str = ballToString(ball1);
+				var ball2str = ballToString(ball2);
+				//myalert("ball1: "+ball1str+"\nball2: "+ball2str+"\n contact angle = "+contAngle);
+				var dist2 = Math.sqrt(Math.pow(ball1.ncx-ball2.ncx,2) + Math.pow(ball1.ncy-ball2.ncy,2));
+				if(dist2 < ball_size*2){
+				//	myalert("Error! balls have not escaped one another!");
+				}
+		//	}
+		}	
+		if(tick > 100){
+			break;
+		}	
+	}
+
+	
+	for(i = 0; i < balls.length; i++){
+		assert(tbreak < 1,"tbreak = "+tbreak);
+		balls[i].speedx = balls[i].pspeedx/(1.0-tbreak);
+		balls[i].speedy = balls[i].pspeedy/(1.0-tbreak);
+	//	balls[i].setAttribute("cx",balls[i].ncx);
+	//	balls[i].setAttribute("cy",balls[i].ncy);
+		setBallPosition(balls[i],balls[i].ncx,balls[i].ncy);
+	}
+	friction();
+//	testbounds(tbreak);
+}
+
+//take a shot (give the white ball an initial speed)
+function shoot(px,py){
+	balls[0].speedx = px;
+	balls[0].speedy = py;
+}
+
+function mouseDown(e){
+	pressTime = 0;
+	startPress = (new Date()).getTime();
+}
+
+function mouseUp(e){//get coords!
+	if(startPress != 0){
+		var x = e.clientX;
+		var y = e.clientY;
+		var a = 0;
+		var p = 0;
+		pressTime = (new Date()).getTime() - startPress;
+		p = pressTime / 200.0;
+		if(p > 20){
+//			p = 20;
+		} 
+		startPress = 0;
+		//alert("presstime = "+pressTime+"ms");
+		//alert("Click, x="+x+", y="+y);
+		x -= parseFloat(balls[0].getAttribute("cx"),10);
+		y -= parseFloat(balls[0].getAttribute("cy"),10);
+		a = Math.atan2(y,x);
+		shoot(p*Math.cos(a),p*Math.sin(a));
+	}
+}
+
+
+init();
+setInterval(function(){animate();},1000/FPS);

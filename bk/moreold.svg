@@ -1,0 +1,94 @@
+<rect x="0" y="0" width="'+SIZE_X+'" height="'+SIZE_Y+'" fill="green" />\
+		<defs>\
+			<mask x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" id="bb9">\
+				<rect x="0" y="0" width="'+(ball_size*2)+'" height="10" fill="white" />\
+				<rect x="0" y="30" width="'+(ball_size*2)+'" height="10" fill="white" />\
+			</mask>\
+		</defs>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum"></text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback"/>\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum" >1</text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">2</text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">3</text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">4</text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">5</text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">6</text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">7</text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">8</text>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">9</text>\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballstripes" mask="url(#bb9)"/>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">10</text>\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballstripes" mask="url(#bb9)"/>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">11</text>\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballstripes" mask="url(#bb9)"/>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">12</text>\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballstripes" mask="url(#bb9)"/>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">13</text>\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballstripes" mask="url(#bb9)"/>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">14</text>\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballstripes" mask="url(#bb9)"/>\
+		</svg>\
+		<svg x="0" y="0" width="'+(ball_size*2)+'" height="'+(ball_size*2)+'" class="billiardball" >\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballback" />\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+(ball_size/2)+'" fill="white" class="billiardballdot" />\
+			<text x="'+ball_size+'" y="'+ball_size+'" fill="black" class="billiardballnum">15</text>\
+			<circle cx="'+ball_size+'" cy="'+ball_size+'" r="'+ball_size+'" fill="white" class="billiardballstripes" mask="url(#bb9)"/>\
+		</svg>\
